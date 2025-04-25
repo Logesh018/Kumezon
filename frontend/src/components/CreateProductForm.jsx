@@ -26,6 +26,8 @@ const CreateProductForm = () => {
       console.log("Error creating product:", error);
     }
   };
+
+  
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {

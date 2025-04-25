@@ -76,7 +76,7 @@ export const useUserStore = create((set, get) => ({
 
 }));
 
-// TODO: Implement the axios interceptors for refreshing access token 15m
+// TODO: Implement the axios interceptors for refreshing access token 30m
 
 let refreshPromise = null;
 
