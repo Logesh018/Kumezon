@@ -23,7 +23,7 @@ const setCookies = (res, accessToken, refreshToken) => {
         httpOnly: true, // prevent XSS attacks - cross-site scripting
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",// prevent CSRF attacks - cross-site request forgery
-        maxAge: 15 * 60 * 1000, // 15 minutes
+        maxAge: 30 * 60 * 1000, // 30 minutes
     });
 
     res.cookie("refreshToken", refreshToken, {
@@ -106,7 +106,7 @@ export const logout = async (req, res) => {
 };
 
 
-// Refresh token - Recreating the access token after it expires (15m)
+// Refresh token - Recreating the access token after it expires (30m)
 export const refreshtoken = async (req, res) => {
     try {
         const refreshToken = req.cookies.refreshToken;
@@ -122,13 +122,13 @@ export const refreshtoken = async (req, res) => {
             return res.status(401).json({ message: "Invalid refresh token" });
         }
 
-        const accessToken = jwt.sign({ userId: decoded.userId }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
+        const accessToken = jwt.sign({ userId: decoded.userId }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "30m" });
 
         res.cookie("accessToken", accessToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "strict",
-            maxAge: 15 * 60 * 1000, // 15 minutes
+            maxAge: 30 * 60 * 1000, // 30 minutes
         });
 
         res.json({ message: "Access token refreshed successfully" });
@@ -139,31 +139,30 @@ export const refreshtoken = async (req, res) => {
 };
 
 export const getProfile = async (req, res) => {
-	try {
-		res.json(req.user);
-	} catch (error) {
-		res.status(500).json({ message: "Server error", error: error.message });
-	}
+    try {
+        res.json(req.user);
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
 };
 
 export const toggleRole = async (req, res) => {
     try {
-      const user = await User.findById(req.user._id);
-  
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-  
-      user.role = user.role === "admin" ? "customer" : "admin";
-      await user.save();
-  
-      res.json({
-        message: `Role updated to ${user.role}`,
-        role: user.role,
-      });
+        const user = await User.findById(req.user._id);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        user.role = user.role === "admin" ? "customer" : "admin";
+        await user.save();
+
+        res.json({
+            message: `Role updated to ${user.role}`,
+            role: user.role,
+        });
     } catch (error) {
-      console.log("Error in toggleRole", error.message);
-      res.status(500).json({ message: "Server error", error: error.message });
+        console.log("Error in toggleRole", error.message);
+        res.status(500).json({ message: "Server error", error: error.message });
     }
-  };
-  
+};
